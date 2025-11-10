@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdexcept>
 
 struct IntArray
 {
@@ -16,9 +15,9 @@ struct IntArray
     }
 
     int add(int i);
-    int get(size_t id) const;
-    size_t size() const;
-    int last() const;
+    int get(size_t id) const noexcept;
+    size_t size() const noexcept;
+    int last() const noexcept;
 
     int* a;
     size_t k;
@@ -61,10 +60,32 @@ int main()
 
 int IntArray::get(size_t id) const
 {
-    if (id >= k)
+    return a[id];
+}
+
+size_t IntArray::size() const noexcept
+{
+    return k;
+}
+
+int IntArray::last() const noexcept
+{
+    return get(size() - 1);
+}
+
+int IntArray::add(int i)
+{
+    int* dint = new int[size() + 1];
+
+    for (size_t i = 0; i < size(); ++i)
     {
-        throw std::logic_error("ERROR: bad id");
+        dint[i] = get(i);
     }
 
-    return a[id];
+    delete[] a;
+    a = dint;
+    a[k] = i;
+    ++k;
+
+    return i;
 }
