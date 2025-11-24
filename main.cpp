@@ -36,13 +36,65 @@ struct IntArray
 
     int add(int i);
     int get(size_t id) const noexcept;
-    /*int at(size_t id) const;*/
     size_t getsize() const noexcept;
     int last() const noexcept;
 
     int* a;
     size_t k;
 };
+
+IntArray::IntArray(const IntArray& rhs) :
+    a(new int[rhs.getsize()]),
+    k(rhs.getsize())
+{
+    for (size_t i = 0; i < rhs.getsize(); ++i)
+        a[i] = rhs.get(i);
+}
+
+int IntArray::get(size_t id) const noexcept
+{
+    return a[id];
+}
+
+size_t IntArray::getsize() const noexcept
+{
+    return k;
+}
+
+int IntArray::last() const noexcept
+{
+    return get(getsize() - 1);
+}
+
+int IntArray::add(int i)
+{
+    int* dint = new int[getsize() + 1];
+
+    for (size_t i = 0; i < getsize(); ++i)
+    {
+        dint[i] = get(i);
+    }
+
+    delete[] a;
+    a = dint;
+    ++k;
+    return i;
+}
+
+IntArray& IntArray::operator=(const IntArray& rhs)
+{
+    if (this == &rhs) return *this;
+    int* p = new int[rhs.getsize()];
+
+    for (size_t i = 0; i < rhs.getsize(); ++i)
+        p[i] = rhs.get(i);
+
+    delete[] a;
+    a = p;
+    k = rhs.getsize();
+
+    return *this;
+}
 
 int main()
 {
@@ -78,61 +130,4 @@ int main()
     {
         return 1;
     }
-}
-
-IntArray::IntArray(const IntArray& rhs) :
-    a(new int[rhs.getsize()]),
-    k(getsize())
-{
-    for (size_t i = 0; i < rhs.getsize(); ++i)
-        a[i] = rhs.get(i);
-}
-
-int IntArray::get(size_t id) const
-{
-    return a[id];
-}
-
-//int IntArray::at(size_t id) const
-//{
-//
-//}
-
-size_t IntArray::getsize() const noexcept
-{
-    return k;
-}
-
-int IntArray::last() const noexcept
-{
-    return get(getsize() - 1);
-}
-
-int IntArray::add(int i)
-{
-    int* dint = new int[getsize() + 1];
-
-    for (size_t i = 0; i < getsize(); ++i)
-    {
-        dint[i] = get(i);
-    }
-
-    delete[] a;
-    a = dint;
-    ++k;
-}
-
-IntArray& IntArray::operator=(const IntArray& rhs)
-{
-    k = rhs.getsize();
-    int* p = new int[rhs.getsize()];
-
-    for (size_t i = 0; i < rhs.getsize(); ++i)
-        p[i] = rhs.get(i);
-
-    delete[] a;
-    a = p;
-    k = rhs.getsize();
-
-    return *this;
 }
