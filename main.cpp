@@ -1,4 +1,7 @@
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <stdexcept>
 
 struct IntArray
 {
@@ -95,6 +98,57 @@ IntArray& IntArray::operator=(const IntArray& rhs)
 
     return *this;
 }
+
+class IntMatrix : public IntArray
+{
+    size_t rows_, cols_;
+
+public:
+    IntMatrix(const char* filename) : IntArray(0)
+    {
+        std::ifstream f(filename);
+        if (!f) throw std::runtime_error("File open error");
+
+        f >> rows_ >> cols_;
+        if (rows_ == 0 || cols_ == 0)
+            throw std::runtime_error("Invalid dimensions");
+
+        delete[] a;
+        k = rows_ * cols_;
+        a = new int[k];
+
+        for (size_t i = 0; i < k; ++i)
+            f >> a[i];
+
+        if (!f) throw std::runtime_error("Read error");
+    }
+
+    int get(size_t i, size_t j) const
+    {
+        return IntArray::get(i * cols_ + j);
+    }
+
+    void set(size_t i, size_t j, int val)
+    {
+        a[i * cols_ + j] = val;
+    }
+
+    size_t getRows() const { return rows_; }
+    size_t getCols() const { return cols_; }
+
+    void print() const
+    {
+        for (size_t i = 0; i < rows_; ++i)
+        {
+            for (size_t j = 0; j < cols_; ++j)
+            {
+                std::cout << get(i, j);
+                if (j + 1 < cols_) std::cout << ' ';
+            }
+            std::cout << '\n';
+        }
+    }
+};
 
 int main()
 {
