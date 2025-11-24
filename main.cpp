@@ -136,6 +136,58 @@ public:
     size_t getRows() const { return rows_; }
     size_t getCols() const { return cols_; }
 
+    void commandI(size_t r, int v)
+    {
+        if (r > rows_) throw std::out_of_range("Invalid row index");
+
+        size_t newRows = rows_ + 1;
+        size_t newCols = cols_;
+        int* newData = new int[newRows * newCols];
+
+        size_t idx = 0;
+        for (size_t i = 0; i < r; ++i)
+            for (size_t j = 0; j < cols_; ++j)
+                newData[idx++] = get(i, j);
+
+        for (size_t j = 0; j < newCols; ++j)
+            newData[idx++] = v;
+
+        for (size_t i = r; i < rows_; ++i)
+            for (size_t j = 0; j < cols_; ++j)
+                newData[idx++] = get(i, j);
+
+        delete[] a;
+        a = newData;
+        k = newRows * newCols;
+        rows_ = newRows;
+        cols_ = newCols;
+    }
+
+    void commandII(size_t c, int v)
+    {
+        if (c > cols_) throw std::out_of_range("Invalid column index");
+
+        size_t newRows = rows_;
+        size_t newCols = cols_ + 1;
+        int* newData = new int[newRows * newCols];
+
+        size_t idx = 0;
+        for (size_t i = 0; i < rows_; ++i)
+        {
+            for (size_t j = 0; j < c; ++j)
+                newData[idx++] = get(i, j);
+            newData[idx++] = v;
+            for (size_t j = c; j < cols_; ++j)
+                newData[idx++] = get(i, j);
+        }
+
+        delete[] a;
+        a = newData;
+        k = newRows * newCols;
+        rows_ = newRows;
+        cols_ = newCols;
+    }
+
     void print() const
     {
         for (size_t i = 0; i < rows_; ++i)
@@ -150,35 +202,40 @@ public:
     }
 };
 
-int main()
+int main(int argc, char* argv[])
 {
     try
     {
-        int next = 0;
-        std::cin >> next;
-
-        IntArray a(next);
-
-        while (std::cin >> next)
+        if (argc != 4)
         {
-            a.add(next);
-        }
-
-        if (!std::cin && !std::cin.eof())
-        {
+            std::cerr << "Usage: " << argv[0] << " <file> <I|II> <pos>\n";
             return 1;
         }
 
-        size_t count = 1;
+        std::string cmd = argv[2];
+        IntMatrix m(argv[1]);
 
-        for (size_t i = 0; i < a.getsize() - 1; ++i)
+        int value;
+        std::cin >> value;
+        if (!std::cin) return 1;
+
+        if (cmd == "I")
         {
-            int d = a.get(i);
-
-            count += !(d % a.last()) ? 1 : 0;
+            size_t r = static_cast<size_t>(std::stoi(argv[3]));
+            m.commandI(r, value);
+            m.print();
         }
-
-        std::cout << count << "\n";
+        else if (cmd == "II")
+        {
+            size_t c = static_cast<size_t>(std::stoi(argv[3]));
+            m.commandII(c, value);
+            m.print();
+        }
+        else
+        {
+            std::cerr << "Unknown command: " << cmd << "\n";
+            return 1;
+        }
     }
     catch (...)
     {
